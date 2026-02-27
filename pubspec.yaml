@@ -15,6 +15,7 @@ dependencies:
   dio: ^5.4.3                 # برای ارتباط با API سایت شما
   flutter_secure_storage: ^9.0.0 # برای ذخیره امن توکن‌ها
   google_fonts: ^6.2.1        # برای استفاده از فونت زیبای وزیرمتن
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../memories/memories_screen.dart';
+import '../razgo/razgo_screen.dart';
+import '../vault/vault_screen.dart'; // از صندوقچه به جای پروفایل فعلاً استفاده می‌کنیم
 
 class MainController extends GetxController {
   // این متغیر تب فعلی را نگه می‌دارد (پیش‌فرض 0 یعنی داشبورد)
@@ -11,8 +13,8 @@ class MainController extends GetxController {
   final List<Widget> pages = [
     DashboardScreen(),
     MemoriesScreen(),
-    const Center(child: Text('بخش رازگو به زودی... 💌')), // صفحه موقت رازگو
-    const Center(child: Text('تنظیمات پروفایل به زودی... ⚙️')), // صفحه موقت پروفایل
+    RazgoScreen(), // جایگزین شد
+    VaultScreen(), // جایگزین شد (آیکون پروفایل فعلاً صندوقچه را باز می‌کند)
   ];
 
   void changePage(int index) {

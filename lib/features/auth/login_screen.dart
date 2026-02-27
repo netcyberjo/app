@@ -23,17 +23,15 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.favorite_rounded, size: 80, color: primaryPink),
-                const SizedBox(height: 20),
-                const Text(
-                  'دلبر',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: darkText),
+                const SizedBox(height: 16),
+                const Text('دلبر', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: darkText)),
+                Text(
+                  _authController.isLoginMode.value ? 'خوش برگشتی دلبر جان 🌸' : 'اینجا زمان می‌ایستد...',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
-                const Text(
-                  'اینجا زمان می‌ایستد...',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
+                // کادر اصلی فرم‌ها
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -43,10 +41,27 @@ class LoginScreen extends StatelessWidget {
                       BoxShadow(color: primaryPink.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
                     ],
                   ),
-                  child: !_authController.isOtpSent.value
-                      ? _buildStep1(primaryPink)
-                      : _buildStep2(primaryPink),
+                  // جابجایی انیمیشنی بین فرم ورود و ثبت‌نام
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _authController.isLoginMode.value
+                        ? _buildLoginView(primaryPink)
+                        : (!_authController.isOtpSent.value ? _buildRegisterStep1(primaryPink) : _buildRegisterStep2(primaryPink)),
+                  ),
                 ),
+                
+                const SizedBox(height: 24),
+                
+                // دکمه تغییر حالت (ورود / ثبت‌نام)
+                TextButton(
+                  onPressed: _authController.toggleMode,
+                  child: Text(
+                    _authController.isLoginMode.value 
+                        ? 'حساب کاربری نداری؟ اینجا ثبت‌نام کن 💖' 
+                        : 'قبلاً ثبت‌نام کردی؟ وارد شو 🌸',
+                    style: const TextStyle(color: primaryPink, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                )
               ],
             )),
           ),
@@ -55,12 +70,41 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStep1(Color primaryPink) {
+  // --- نمای ورود (Login) ---
+  Widget _buildLoginView(Color primaryPink) {
     return Column(
+      key: const ValueKey('loginView'),
+      children: [
+        _buildTextField(_authController.loginIdentifierController, 'نام کاربری یا موبایل', Icons.person, TextInputType.text),
+        const SizedBox(height: 16),
+        _buildTextField(_authController.loginPasswordController, 'رمز عبور', Icons.lock, TextInputType.visiblePassword, isObscure: true),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: _authController.isLoading.value ? null : _authController.login,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryPink,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: _authController.isLoading.value
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('ورود به دلبر', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- نمای ثبت نام (Register Step 1) ---
+  Widget _buildRegisterStep1(Color primaryPink) {
+    return Column(
+      key: const ValueKey('registerStep1'),
       children: [
         _buildTextField(_authController.phoneController, 'شماره موبایل', Icons.phone_android, TextInputType.phone),
         const SizedBox(height: 16),
-        _buildTextField(_authController.usernameController, 'نام کاربری', Icons.person, TextInputType.text),
+        _buildTextField(_authController.usernameController, 'نام کاربری (انگلیسی)', Icons.alternate_email, TextInputType.text),
         const SizedBox(height: 16),
         _buildTextField(_authController.passwordController, 'رمز عبور', Icons.lock, TextInputType.visiblePassword, isObscure: true),
         const SizedBox(height: 24),
@@ -82,8 +126,10 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStep2(Color primaryPink) {
+  // --- نمای تایید کد (Register Step 2) ---
+  Widget _buildRegisterStep2(Color primaryPink) {
     return Column(
+      key: const ValueKey('registerStep2'),
       children: [
         const Text('کد تایید برای شما پیامک شد 💌', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
@@ -105,12 +151,13 @@ class LoginScreen extends StatelessWidget {
         ),
         TextButton(
           onPressed: () => _authController.isOtpSent.value = false,
-          child: const Text('ویرایش شماره', style: TextStyle(color: Colors.grey)),
+          child: const Text('ویرایش شماره موبایل', style: TextStyle(color: Colors.grey)),
         )
       ],
     );
   }
 
+  // متد کمکی برای ساخت فیلدهای متنی
   Widget _buildTextField(TextEditingController controller, String label, IconData icon, TextInputType type, {bool isObscure = false}) {
     return TextField(
       controller: controller,

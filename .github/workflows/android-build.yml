@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch: # امکان اجرای دستی اکشن را هم به شما می‌دهد
+  workflow_dispatch: # امکان اجرای دستی اکشن را هم به شمای می‌دهد
 
 jobs:
   build:

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+// تداخل کلمات کلیدی بین این دو پکیج با دستور hide برطرف شد
+import 'package:get/get.dart' hide FormData, Response, MultipartFile;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/api_client.dart';
 
@@ -9,15 +10,13 @@ class AuthController extends GetxController {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   var isLoading = false.obs;
-  var isOtpSent = false.obs; // آیا در مرحله وارد کردن کد هستیم؟
+  var isOtpSent = false.obs; 
 
-  // کنترلرهای فیلدهای متنی
   final phoneController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final otpController = TextEditingController();
 
-  // مرحله ۱: ارسال درخواست دریافت کد
   Future<void> sendOtp() async {
     if (phoneController.text.isEmpty || usernameController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar('خطا', 'لطفاً تمامی فیلدها را پر کنید عزیزم 🌸', 
@@ -51,7 +50,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // مرحله ۲: تایید کد و ورود
   Future<void> verifyOtp() async {
     if (otpController.text.length < 6) {
       Get.snackbar('خطا', 'کد تایید باید ۶ رقم باشه.', 
@@ -70,14 +68,12 @@ class AuthController extends GetxController {
       final response = await _apiClient.dio.post('auth_handler.php', data: formData);
 
       if (response.data['success'] == true) {
-        // ذخیره توکن امن در حافظه گوشی
         String token = response.data['api_token'];
         await _storage.write(key: 'api_token', value: token);
         
         Get.snackbar('خوش اومدی!', response.data['message'], 
             backgroundColor: Colors.green.withOpacity(0.8), colorText: Colors.white);
             
-        // هدایت به صفحه داشبورد (بعدا می‌سازیم)
         Get.offAllNamed('/dashboard');
       } else {
         Get.snackbar('خطا', response.data['error'] ?? 'کد اشتباهه.', 

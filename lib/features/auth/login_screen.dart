@@ -9,7 +9,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // رنگ‌های تم دلبر
     const Color primaryPink = Color(0xFFF72585);
     const Color lightPink = Color(0xFFFFF0F5);
     const Color darkText = Color(0xFF5C3A3A);
@@ -23,7 +22,6 @@ class LoginScreen extends StatelessWidget {
             child: Obx(() => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // لوگو یا آیکون
                 const Icon(Icons.favorite_rounded, size: 80, color: primaryPink),
                 const SizedBox(height: 20),
                 const Text(
@@ -36,7 +34,6 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // فرم‌ها
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -77,7 +74,7 @@ class LoginScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             child: _authController.isLoading.value
-                ? const CircularProgressColor(color: Colors.white)
+                ? const CircularProgressIndicator(color: Colors.white)
                 : const Text('شروع داستان', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),
@@ -102,7 +99,7 @@ class LoginScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             child: _authController.isLoading.value
-                ? const CircularProgressColor(color: Colors.white)
+                ? const CircularProgressIndicator(color: Colors.white)
                 : const Text('تایید و ورود', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),

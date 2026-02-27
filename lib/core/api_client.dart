@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'mock_api_handler.dart'; // اضافه کردن فایل دیتای آفلاین
 
-// این کلاس وظیفه ارسال درخواست‌ها به فایل‌های PHP شما را دارد
 class ApiClient {
   static const String baseUrl = 'https://dlbr.ir/api/';
   final Dio _dio;
@@ -12,7 +12,6 @@ class ApiClient {
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
-          // این هدر برای تشخیص کلاینت موبایل در سمت سرور مفید است
           headers: {'Accept': 'application/json'}, 
         )),
         _storage = const FlutterSecureStorage() {
@@ -22,13 +21,42 @@ class ApiClient {
   void _initializeInterceptors() {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // در هر درخواست، توکن ذخیره شده را خوانده و به هدر اضافه می‌کند
         final token = await _storage.read(key: 'api_token');
-        if (token != null) {
+        
+        // =======================================================
+        // سیستم هوشمند رهگیری حالت آفلاین (Offline Mocking)
+        // =======================================================
+        if (token == 'offline_admin_token') {
+          String action = '';
+          
+          // پیدا کردن نام اکشن از داخل اطلاعات ارسال شده
+          if (options.data is FormData) {
+            final formData = options.data as FormData;
+            final actionField = formData.fields.firstWhere(
+                (e) => e.key == 'action', 
+                orElse: () => const MapEntry('action', ''));
+            action = actionField.value;
+          } else if (options.data is Map) {
+            action = options.data['action'] ?? '';
+          }
+
+          // دریافت پاسخ از فایل محلی به جای اینترنت
+          final mockResponse = await MockApiHandler.getResponse(action, options.data);
+          
+          // تولید یک پاسخ موفقیت‌آمیز مجازی و بازگرداندن آن به صفحه بدون اتصال به اینترنت!
+          return handler.resolve(Response(
+            requestOptions: options,
+            data: mockResponse,
+            statusCode: 200,
+          ));
+        }
+        // =======================================================
+
+        // اگر توکن عادی بود، روند طبیعی ادامه پیدا می‌کند
+        if (token != null && token != 'offline_admin_token') {
           options.headers['Authorization'] = 'Bearer $token';
         }
         
-        // اطمینان از اینکه همه درخواست‌های موبایل فلگ is_mobile را دارند
         if (options.data is FormData) {
           (options.data as FormData).fields.add(const MapEntry('is_mobile', 'true'));
         } else if (options.data is Map<String, dynamic>) {

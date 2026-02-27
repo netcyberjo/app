@@ -17,7 +17,8 @@ class RazgoController extends GetxController {
 
   Future<void> fetchMessages() async {
     try {
-      isLoading(true);
+      if (messages.isEmpty) isLoading(true);
+      
       final formData = dio.FormData.fromMap({'action': 'get_razgo_messages'});
       final response = await _apiClient.dio.post('handler.php', data: formData);
       
@@ -50,51 +51,55 @@ class RazgoScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.messages.isEmpty) {
           return const Center(child: CircularProgressIndicator(color: primaryPink));
         }
 
-        if (controller.messages.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.mail_outline, size: 80, color: primaryPink.withOpacity(0.3)),
-                const SizedBox(height: 16),
-                const Text('هنوز هیچ پیام ناشناسی برات نیومده دلبر جان 🌸', style: TextStyle(color: Color(0xFF5C3A3A))),
-              ],
-            )
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.messages.length,
-          itemBuilder: (context, index) {
-            final msg = controller.messages[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        return RefreshIndicator(
+          onRefresh: controller.fetchMessages,
+          color: primaryPink,
+          backgroundColor: Colors.white,
+          child: controller.messages.isEmpty
+              ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('فرستنده: ${controller.nickname.value}', style: const TextStyle(fontWeight: FontWeight.bold, color: primaryPink)),
-                        Text(msg['created_at'].toString().substring(0, 10), style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(msg['message_text'] ?? '', style: const TextStyle(color: Color(0xFF5C3A3A), height: 1.5)),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                    Icon(Icons.mail_outline, size: 80, color: primaryPink.withOpacity(0.3)),
+                    const SizedBox(height: 16),
+                    const Text('هنوز هیچ پیام ناشناسی برات نیومده دلبر جان 🌸\n(صفحه رو بکش پایین تا رفرش بشه)', 
+                        textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF5C3A3A))),
                   ],
+                )
+              : ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  itemCount: controller.messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = controller.messages[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('فرستنده: ${controller.nickname.value}', style: const TextStyle(fontWeight: FontWeight.bold, color: primaryPink)),
+                                Text(msg['created_at'].toString().substring(0, 10), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(msg['message_text'] ?? '', style: const TextStyle(color: Color(0xFF5C3A3A), height: 1.5)),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
-            );
-          },
         );
       }),
     );

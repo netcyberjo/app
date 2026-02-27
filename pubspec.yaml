@@ -1,0 +1,25 @@
+name: delbar
+description: دفتر خاطرات عاشقانه دلبر
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  # پکیج‌های اضافه شده برای معماری اپلیکیشن:
+  get: ^4.6.6                 # برای مدیریت State و مسیریابی
+  dio: ^5.4.3                 # برای ارتباط با API سایت شما
+  flutter_secure_storage: ^9.0.0 # برای ذخیره امن توکن‌ها
+  google_fonts: ^6.2.1        # برای استفاده از فونت زیبای وزیرمتن
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,48 @@
+name: Build Delbar Android APK
+
+# این اکشن هر زمان که کدی در شاخه اصلی پوش شود اجرا می‌شود
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # امکان اجرای دستی اکشن را هم به شما می‌دهد
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ۱. دریافت کدهای شما از مخزن
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ۲. نصب جاوا (پیش‌نیاز اندروید)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # ۳. نصب فلاتر روی سرور گیت‌هاب
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0' # یا هر نسخه پایداری که ترجیح می‌دهید
+          channel: 'stable'
+
+      # ۴. دریافت پکیج‌های فلاتر
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # ۵. ساخت فایل APK اندروید
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      # ۶. آپلود فایل APK برای دانلود شما
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Delbar-App-Release
+          path: build/app/outputs/flutter-apk/app-release.apk

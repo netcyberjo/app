@@ -10,11 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  # پکیج‌های اضافه شده برای معماری اپلیکیشن:
-  get: ^4.6.6                 # برای مدیریت State و مسیریابی
-  dio: ^5.4.3                 # برای ارتباط با API سایت شما
-  flutter_secure_storage: ^9.0.0 # برای ذخیره امن توکن‌ها
-  google_fonts: ^6.2.1        # برای استفاده از فونت زیبای وزیرمتن
+  get: ^4.6.6                 
+  dio: ^5.4.3                 
+  flutter_secure_storage: ^9.0.0 
+  google_fonts: ^6.2.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
